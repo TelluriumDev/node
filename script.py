@@ -98,7 +98,7 @@ def main() -> None:
         stdout=subprocess.DEVNULL
     )
     shutil.copy(f"nodejs/Release/node-{node_version}-win-x64/libnode.lib", "temp/lib/libnode.lib")
-    shutil.copytree(f"nodejs/Release/node-{node_version}-win-x64/include", "temp/include", dirs_exist_ok=True)
+    shutil.copytree(f"nodejs/Release/node-{node_version}-win-x64/include/node", "temp/include", dirs_exist_ok=True)
     subprocess.run(
         [
             "7z",
