@@ -3,6 +3,7 @@
 import json
 import os
 import shutil
+import glob
 import subprocess
 import hashlib
 import urllib.request
@@ -87,46 +88,43 @@ def main() -> None:
         [
             "7z",
             "a",
-            "-mx9",
             "-mm=Deflate",
             "-t7z",
-            "bin/libnode.pdb.7z",
-            "nodejs/Release/libnode.pdb"
+            "../../bin/pdb.7z",
+            "*.pdb"
         ],
         check=True,
         shell=True,
-        stdout=subprocess.DEVNULL
+        cwd="nodejs/Release"
     )
-    shutil.copy(f"nodejs/Release/node-{node_version}-win-x64/libnode.lib", "temp/lib/libnode.lib")
+    for file_path in glob.glob("nodejs/Release/**.lib", recursive=True):
+        shutil.copy(file_path, "temp/lib")
+    shutil.copytree(f"nodejs/Release/lib", "temp/lib", dirs_exist_ok=True)
     shutil.copytree(f"nodejs/Release/node-{node_version}-win-x64/include/node", "temp/include", dirs_exist_ok=True)
     subprocess.run(
         [
             "7z",
             "a",
-            "-mx9",
             "-mm=Deflate",
-            "-tzip",
-            "../bin/sdk.zip",
+            "-t7z",
+            "../bin/sdk.7z",
             "*"
         ],
         check=True,
         shell=True,
-        stdout=subprocess.DEVNULL,
         cwd="temp"
     )
     subprocess.run(
         [
             "7z",
             "a",
-            "-mx9",
             "-mm=Deflate",
-            "-tzip",
-            "../../../../bin/node_modules.zip",
+            "-t7z",
+            "../../../../bin/node_modules.7z",
             f"*"
         ],
         check=True,
         shell=True,
-        stdout=subprocess.DEVNULL,
         cwd=f"nodejs/Release/node-{node_version}-win-x64/node_modules"
     )
     print("打包成功，开始创建发行版")
@@ -135,12 +133,12 @@ def main() -> None:
         file.write("\n".join([
             f"**Full Changelog**: https://github.com/nodejs/node/commits/{node_version}",
             f"",
-            f"|       file       |                              sha256                              |",
-            f"| ---------------  | ---------------------------------------------------------------- |",
-            f"|   libnode.dll    | {file_sha256("bin/libnode.dll")} |",
-            f"|  libnode.pdb.7z  | {file_sha256("bin/libnode.pdb.7z")} |",
-            f"|     sdk.zip      | {file_sha256("bin/sdk.zip")} |",
-            f"| node_modules.zip | {file_sha256("bin/node_modules.zip")} |"
+            f"|       file      |                              sha256                              |",
+            f"| --------------- | ---------------------------------------------------------------- |",
+            f"|   libnode.dll   | {file_sha256("bin/libnode.dll")} |",
+            f"|     pdb.7z      | {file_sha256("bin/pdb.7z")} |",
+            f"|     sdk.7z      | {file_sha256("bin/sdk.7z")} |",
+            f"| node_modules.7z | {file_sha256("bin/node_modules.7z")} |"
         ]))
 
     subprocess.run(
