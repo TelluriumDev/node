@@ -73,7 +73,6 @@ def main() -> None:
             "dll",
             "package"
         ],
-        check=True,
         shell=True,
         cwd="nodejs"
     )
