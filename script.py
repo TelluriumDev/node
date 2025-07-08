@@ -32,10 +32,11 @@ def main() -> None:
     local_version: str = get_latest_release(os.environ.get("GITHUB_REPOSITORY") or "ZMBlocks/node")
     print(f"当前仓库版本: {local_version}")
 
-    if node_version == local_version:
-        return print("最新版本的nodejs节点与本地存储库中的最新标签相同")
+    # if node_version == local_version:
+    #     return print("最新版本的nodejs节点与本地存储库中的最新标签相同")
     
     print("克隆最新版本的nodejs节点...")
+    node_version = "v22.17.0"
     subprocess.run(
         [
             "git",
